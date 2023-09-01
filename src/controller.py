@@ -1,0 +1,2 @@
+def kitestar():
+    return "Teste"
