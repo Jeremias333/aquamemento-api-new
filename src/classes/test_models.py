@@ -1,4 +1,4 @@
-from unittest import TestCase, main, mock
+from unittest import TestCase
 from models import Person, db_url, Container, Info
 import pytest
 import datetime

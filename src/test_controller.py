@@ -1,19 +1,12 @@
-try:
-    import sys
-    import os
-    sys.path.append(
-        os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__), '.'
-            )
-        )
-    )
-except:
-    raise
+from unittest import TestCase
+from controller import ControllerUtils
 
-from unittest import TestCase, main, mock
-from controller import kitestar
+class TestControllerUtils(TestCase):
+    def test_controller_utils_create_db(self):
+        self.assertTrue(ControllerUtils.start_db())
 
-
-def test_testar():
-    assert kitestar() == "Teste"
+    def test_controller_utils_create_db_at_init(self):
+        self.assertTrue(ControllerUtils.start_db(at_init=True))
+    
+    def test_initialize_db(self):
+        self.assertTrue(ControllerUtils.initialize_db())
