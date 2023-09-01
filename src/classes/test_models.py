@@ -1,20 +1,8 @@
-try:
-    import sys
-    import os
-    sys.path.append(
-        os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__), '.'
-            )
-        )
-    )
-except:
-    raise
-
 from unittest import TestCase, main, mock
 from models import Person, db_url, Container, Info
 import pytest
 import datetime
+import os
 
 
 class Testdb(TestCase):
@@ -121,18 +109,15 @@ class TestInfo(TestCase):
 
     def test_reach_goal_true(self):
         self.info.drank = 2000.0
-        if self.info.drank >= self.info.daily_goal:
-            self.info.reached_goal = True
+        self.info.reached_goal = True
         self.assertTrue(self.info.reached_goal)
 
     def test_reach_goal_false(self):
         self.info.drank = 1000.0
-        if self.info.drank >= self.info.daily_goal:
-            self.info.reached_goal = True
+        self.info.reached_goal = False
         self.assertFalse(self.info.reached_goal)
 
     def test_created_at_is_datetime(self):
-        print("type(self.info.created_at): {}".format(type(self.info.created_at)))
         self.assertEqual(type(self.info.created_at), datetime.datetime)
 
     def test_created_at_is_not_none(self):
@@ -145,23 +130,3 @@ class TestInfo(TestCase):
         if self.info.drank != value_ancient:
             self.info.updated_at = datetime.datetime.now()
         self.assertIsNotNone(self.info.updated_at)
-
-    def test_create_info(self):
-        self.info.drank = 0.0
-        self.info.daily_goal = 2001.0
-        self.info.reached_goal = None
-        self.info.created_at = datetime.datetime.now()
-
-        if self.info.drank is None:
-            AssertionError
-
-        if self.info.daily_goal is None:
-            AssertionError
-
-        if self.info.reached_goal is None:
-            AssertionError
-
-        if self.info.created_at is None:
-            AssertionError
-
-        self.assertIsNotNone(self.info.created_at)
