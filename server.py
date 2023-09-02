@@ -204,8 +204,8 @@ async def info_create(request: Request):
         body = json.loads(body)
 
         controller = ControllerInfo()
-        controller.create(body['daily_goal'], body['drank'],
-                          body['reached_goal'], body['person_id'])
+        controller.create(
+            body['drank'], body['reached_goal'], body['person_id'])
 
         return JSONResponse(status_code=200, content={
             "message": body
@@ -215,3 +215,76 @@ async def info_create(request: Request):
             "message": "Ocorreu um erro interno: {}".format(e)
         })
 
+
+@app.get("/api/v1/info/history/{person_id}/")
+def info_list_by_person(request: Request, person_id):
+    try:
+        controller = ControllerInfo()
+        infos = controller.list_all_by_person(person_id)
+
+        return JSONResponse(status_code=200, content={
+            "message": infos
+        })
+    except ValueError as e:
+        return JSONResponse(status_code=500, content={
+            "message": "Ocorreu um erro interno: {}".format(e)
+        })
+
+@app.get("/api/v1/info/today/{person_id}/")
+def info_list_by_person(request: Request, person_id):
+    try:
+        controller = ControllerInfo()
+        infos = controller.get_info_for_today(person_id)
+
+        return JSONResponse(status_code=200, content={
+            "message": infos
+        })
+    except ValueError as e:
+        return JSONResponse(status_code=500, content={
+            "message": "Ocorreu um erro interno: {}".format(e)
+        })
+
+@app.post("/api/v1/info/consume/")
+async def info_consume(request: Request):
+    try:
+        body = await request.body()
+        body = json.loads(body)
+
+        controller = ControllerInfo()
+        value = controller.consume_drink(body['info_id'], body['ml'])
+
+        return JSONResponse(status_code=200, content={
+            "message": value
+        })
+    except ValueError as e:
+        return JSONResponse(status_code=500, content={
+            "message": "Ocorreu um erro interno {}".format(e)
+        })
+
+@app.get("/api/v1/info/remaning/{info_id}/")
+def info_remaning(request: Request, info_id):
+    try:
+        controller = ControllerInfo()
+        value = controller.remaning_goal(info_id)
+
+        return JSONResponse(status_code=200, content={
+            "message": value
+        })
+    except ValueError as e:
+        return JSONResponse(status_code=500, content={
+            "message": "Ocorreu um erro interno {}".format(e)
+        })
+
+@app.get("/api/v1/info/remaning/goal/percent/{info_id}/")
+def info_remaning_percent(request: Request, info_id):
+    try:
+        controller = ControllerInfo()
+        value = controller.remaning_goal_percent(info_id)
+
+        return JSONResponse(status_code=200, content={
+            "message": value
+        })
+    except ValueError as e:
+        return JSONResponse(status_code=500, content={
+            "message": "Ocorreu um erro interno {}".format(e)
+        })

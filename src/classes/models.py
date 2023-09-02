@@ -19,7 +19,7 @@ class Container(BaseModel):
     capacity = FloatField(null=False)
 
 class Info(BaseModel):
-    daily_goal = FloatField(null=False)
+    daily_goal = FloatField(null=True)
     drank = FloatField(null=False, default=0)
     reached_goal = BooleanField(default=False)
 

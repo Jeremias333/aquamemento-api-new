@@ -27,7 +27,3 @@ $ pytest --cov test/
 - [Peewee](http://docs.peewee-orm.com/en/latest/)
 - [Pytest](https://docs.pytest.org/en/stable/)
 
-## Fluxo
-
-> Criar um novo usuário
-

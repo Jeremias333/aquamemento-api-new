@@ -66,12 +66,14 @@ class ControllerInfo():
     def __init__(self):
         self.info = Info()
 
-    def create(self, daily_goal, drank, reached_goal, person_id):
+    def create(self, drank, reached_goal, person_id):
         try:
-            info = self.info.create(
-                daily_goal=daily_goal, drank=drank, reached_goal=reached_goal, person=person_id)
             person = Person.get_or_none(id=person_id)
+            info = self.info.create(
+                drank=drank, reached_goal=reached_goal, person=person_id)
+            info.daily_goal = person.kg * 35
             person.now_drink = info.id
+            info.save()
             person.save()
             info = json.dumps(model_to_dict(
                 info), default=ControllerUtils.datetime_handler)
@@ -95,6 +97,69 @@ class ControllerInfo():
             infos = list(self.info.select().dicts())
             infos = json.dumps(infos, default=ControllerUtils.datetime_handler)
             return infos
+        except Exception as e:
+            raise e
+
+    def list_all_by_person(self, person_id):
+        try:
+            infos = list(self.info.select().where(
+                Info.person == person_id).dicts())
+            infos = json.dumps(infos, default=ControllerUtils.datetime_handler)
+            return infos
+        except Exception as e:
+            raise e
+
+    def get_info_for_today(self, person_id):
+        try:
+            info = self.info.get_or_none(
+                Info.person == person_id, Info.created_at.day == datetime.datetime.now().day)
+            if info is None:
+                person = Person.get_or_none(id=person_id)
+                info = self.info.create(
+                    drank=0, reached_goal=False, person=person_id)
+                person.now_drink = info.id
+                person.save()
+            info = json.dumps(model_to_dict(
+                info), default=ControllerUtils.datetime_handler)
+            if info is None:
+                return None
+            return info
+        except Exception as e:
+            raise e
+
+    def consume_drink(self, info_id, ml):
+        try:
+            info = self.info.get_or_none(id=info_id)
+            if info is None:
+                return None
+            info.drank += ml
+            info.save()
+
+            if info.drank >= info.daily_goal:
+                info.reached_goal = True
+                info.save()
+
+            info = self.info.get_or_none(id=info_id)
+
+            return {"Drank":info.drank}
+        except Exception as e:
+            raise e
+
+    def remaning_goal(self, info_id):
+        try:
+            info = self.info.get_or_none(id=info_id)
+            if info is None:
+                return None
+            return info.daily_goal - info.drank
+        except Exception as e:
+            raise e
+
+    def remaning_goal_percent(self, info_id):
+        try:
+            info = self.info.get_or_none(id=info_id)
+            if info is None:
+                return None
+            return (info.drank / info.daily_goal) * 100
         except Exception as e:
             raise e
 

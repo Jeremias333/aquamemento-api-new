@@ -38,8 +38,7 @@ class TestControllerInfo(TestCase):
         self.info = ControllerInfo()
 
     def test_create(self):
-        self.assertIsNotNone(self.info.create(
-            daily_goal=1200, drank=0, reached_goal=False, person_id=1))
+        self.assertIsNotNone(self.info.create(drank=0, reached_goal=False, person_id=1))
 
     def test_get_by_id(self):
         self.assertIsNotNone(self.info.get_by_id(1))
