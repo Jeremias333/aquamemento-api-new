@@ -1,16 +1,102 @@
+try:
+    import sys
+    import os
+    sys.path.append(
+        os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__), '.'
+            )
+        )
+    )
+except:
+    raise
+
+
 from peewee import *
-from src.classes.models import Person, Container, Info
+from models import Person, Container, Info
 import json
 import datetime
-from playhouse.shortcuts import model_to_dict, dict_to_model
+from playhouse.shortcuts import model_to_dict
 
 
 class ControllerPerson():
-    pass
+    def __init__(self):
+        self.person = Person()
+
+    def create(self, name, kg):
+        try:
+            person = self.person.create(name=name, kg=kg)
+            person = json.dumps(model_to_dict(person))
+            return person
+        except Exception as e:
+            raise e
+
+    def get_by_id(self, id):
+        try:
+            person = self.person.get_or_none(id=id)
+            person = json.dumps(model_to_dict(person))
+            if person is None:
+                return None
+            return person
+        except Exception as e:
+            raise e
+
+    def list_all(self):
+        try:
+            persons = list(self.person.select().dicts())
+            persons = json.dumps(persons)
+            return persons
+        except Exception as e:
+            raise e
+
+    def set_drink(self, person_id, info_id):
+        try:
+            person = self.person.get_or_none(id=person_id)
+            if person is None:
+                return None
+            person.now_drink = info_id
+            person.save()
+            print(person.now_drink)
+            return True
+        except Exception as e:
+            raise e
 
 
 class ControllerInfo():
-    pass
+    def __init__(self):
+        self.info = Info()
+
+    def create(self, daily_goal, drank, reached_goal, person_id):
+        try:
+            info = self.info.create(
+                daily_goal=daily_goal, drank=drank, reached_goal=reached_goal, person=person_id)
+            person = Person.get_or_none(id=person_id)
+            person.now_drink = info.id
+            person.save()
+            info = json.dumps(model_to_dict(
+                info), default=ControllerUtils.datetime_handler)
+            return info
+        except Exception as e:
+            raise e
+
+    def get_by_id(self, id):
+        try:
+            info = self.info.get_or_none(id=id)
+            info = json.dumps(model_to_dict(
+                info), default=ControllerUtils.datetime_handler)
+            if info is None:
+                return None
+            return info
+        except Exception as e:
+            raise e
+
+    def list_all(self):
+        try:
+            infos = list(self.info.select().dicts())
+            infos = json.dumps(infos, default=ControllerUtils.datetime_handler)
+            return infos
+        except Exception as e:
+            raise e
 
 
 class ControllerContainer():
@@ -20,7 +106,6 @@ class ControllerContainer():
     def create(self, title, capacity):
         try:
             container = self.container.create(title=title, capacity=capacity)
-
             container = json.dumps(model_to_dict(container))
             return container
         except Exception as e:
@@ -110,7 +195,7 @@ class ControllerUtils():
         except Exception as e:
             raise e
 
-    @classmethod
+    @staticmethod
     def datetime_handler(x):
         if isinstance(x, datetime.datetime):
             return x.isoformat()

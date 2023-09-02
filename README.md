@@ -13,12 +13,12 @@ $ pytest -v
 $ pytest --cov test/
 
 ## Todo
-- [ ] Implementar ORM
-- [ ] Implementar testes
-- [ ] Implementar controllers
+- [x] Implementar ORM
+- [x] Implementar testes
+- [x] Implementar controllers
 - [x] Implementar models
-- [ ] Implementar rotas
-- [ ] Inicializar dados iniciais 
+- [x] Implementar rotas
+- [x] Inicializar dados iniciais 
 
 ## Tecnologias utilizadas
 
