@@ -1,15 +1,49 @@
 from peewee import *
-from classes.models import Person, Container, Info
-import classes.models as models
+from src.classes.models import Person, Container, Info
+import json
+import datetime
+from playhouse.shortcuts import model_to_dict, dict_to_model
+
 
 class ControllerPerson():
     pass
 
+
 class ControllerInfo():
     pass
 
+
 class ControllerContainer():
-    pass
+    def __init__(self):
+        self.container = Container()
+
+    def create(self, title, capacity):
+        try:
+            container = self.container.create(title=title, capacity=capacity)
+
+            container = json.dumps(model_to_dict(container))
+            return container
+        except Exception as e:
+            raise e
+
+    def get_by_id(self, id):
+        try:
+            container = self.container.get_or_none(id=id)
+            container = json.dumps(model_to_dict(container))
+            if container is None:
+                return None
+            return container
+        except Exception as e:
+            raise e
+
+    def list_all(self):
+        try:
+            containers = list(self.container.select().dicts())
+            containers = json.dumps(containers)
+            return containers
+        except Exception as e:
+            raise e
+
 
 class ControllerUtils():
     db_url = 'db.sqlite3'
@@ -67,3 +101,17 @@ class ControllerUtils():
             return True
         except Exception as e:
             raise e
+
+    @classmethod
+    def delete_all(cls):
+        try:
+            cls.db.drop_tables([Person, Container, Info])
+            return True
+        except Exception as e:
+            raise e
+
+    @classmethod
+    def datetime_handler(x):
+        if isinstance(x, datetime.datetime):
+            return x.isoformat()
+        raise TypeError("Unknown type")
